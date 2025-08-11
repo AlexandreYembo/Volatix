@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Volatix — Admin</title>
+  <!-- Tailwind CDN for quick styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Glass / frosted effect */
+    .glass {
+      background: rgba(255,255,255,0.04);
+      -webkit-backdrop-filter: blur(8px) saturate(120%);
+      backdrop-filter: blur(8px) saturate(120%);
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    }
+        .light-mode .glass {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+    /* Volatix logo text with highlighted X */
+    .brand {
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .brand .x {
+      color: #f7c200; /* yellow */
+      position: relative;
+      padding-left: 0.12rem;
+      padding-right: 0.12rem;
+      transform: skewX(-8deg);
+      font-weight: 800;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.35);
+    }
+
+    /* Yellow / black color tokens */
+    :root{
+      --vol-yellow: #f7c200;
+      --vol-black: #070707;
+    }
+
+    /* data grid styles */
+    .table-fixed th, .table-fixed td { white-space: nowrap; }
+
+    /* rounded icon circle */
+    .logo-circle{
+      width:48px; height:48px; border-radius:9999px; display:inline-grid; place-items:center; background:var(--vol-black);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6) inset, 0 6px 18px rgba(0,0,0,0.6);
+    }
+    .logo-x{ color:var(--vol-yellow); font-weight:900; font-size:1.2rem; transform:rotate(-6deg); }
+
+    /* subtle page background gradient */
+    body{ background: linear-gradient(180deg, #020202 0%, #0b0b0b 60%); }
+
+    /* responsive grid for layout */
+    @media (min-width: 1024px){
+      .content-grid{ grid-template-columns: 300px 1fr; }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-300">
+  <!-- Top bar -->
+  <header class="p-4 flex items-center justify-between glass">
+    <div class="flex items-center gap-3">
+      <!-- Replace ./logo-volatix.png with your transparent PNG icon -->
+      <div class="logo-circle">
+        <!-- if you prefer using the generated PNG, put it in the same folder and name it logo-volatix.png -->
+        <!-- fallback to text X for live preview -->
+        <span class="logo-x">X</span>
+      </div>
+      <div>
+        <div class="brand text-white text-xl">Volati<span class="x">x</span></div>
+        <div class="text-xs text-slate-400">Cache lifecycle manager</div>
+      </div>
+         <button id="themeToggle" class="px-4 py-2 bg-yellow-400 text-black font-semibold rounded-lg hover:bg-yellow-300 transition">
+            Light Mode
+          </button>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-2 bg-black/30 glass rounded-lg px-3 py-1">
+        <input class="bg-transparent outline-none text-sm text-slate-200" placeholder="Search resources..." />
+      </div>
+      <button class="px-3 py-2 rounded-md border border-yellow-400 text-yellow-300 glass hover:bg-yellow-600/5">New</button>
+      <div class="w-10 h-10 rounded-full glass flex items-center justify-center">A</div>
+    </div>
+  </header>
+
+  <main class="p-6">
+    <div class="mx-auto max-w-7xl content-grid grid gap-6">
+      <!-- Sidebar -->
+      <aside class="glass p-4 rounded-xl">
+        <nav class="space-y-2">
+          <a class="flex items-center gap-3 p-2 rounded hover:bg-white/2" href="#">
+            <div class="w-8 h-8 rounded bg-yellow-500/10 flex items-center justify-center text-yellow-300">D</div>
+            <div>
+              <div class="text-sm">Dashboard</div>
+              <div class="text-xs text-slate-400">Overview & metrics</div>
+            </div>
+          </a>
+
+          <a class="flex items-center gap-3 p-2 rounded hover:bg-white/2" href="#">
+            <div class="w-8 h-8 rounded bg-yellow-500/10 flex items-center justify-center text-yellow-300">C</div>
+            <div>
+              <div class="text-sm">Caches</div>
+              <div class="text-xs text-slate-400">Manage cache pools</div>
+            </div>
+          </a>
+
+          <a class="flex items-center gap-3 p-2 rounded hover:bg-white/2" href="#">
+            <div class="w-8 h-8 rounded bg-yellow-500/10 flex items-center justify-center text-yellow-300">S</div>
+            <div>
+              <div class="text-sm">Settings</div>
+              <div class="text-xs text-slate-400">Policies & TTL</div>
+            </div>
+          </a>
+        </nav>
+
+        <hr class="my-4 border-slate-800" />
+        <div class="text-xs text-slate-400">Live nodes</div>
+        <ul class="mt-2 space-y-2 text-sm">
+          <li class="flex items-center justify-between"><span>node-01</span><span class="text-xs text-slate-400">healthy</span></li>
+          <li class="flex items-center justify-between"><span>node-02</span><span class="text-xs text-amber-400">syncing</span></li>
+        </ul>
+      </aside>
+
+      <!-- Main content -->
+      <section>
+        <div class="glass p-4 rounded-xl mb-6">
+          <h2 class="text-lg text-white font-semibold">Cache Pools</h2>
+          <p class="text-sm text-slate-400">Create and tune cache pools, set TTLs and eviction policies.</p>
+
+          <!-- Form -->
+          <form id="poolForm" class="mt-4 grid gap-3 sm:grid-cols-2">
+            <div>
+              <label class="text-xs text-slate-400">Pool name</label>
+              <input name="name" required class="mt-1 w-full bg-transparent outline-none border border-slate-800 rounded p-2" placeholder="e.g. sessions-cache" />
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">Default TTL (seconds)</label>
+              <input name="ttl" type="number" min="0" value="3600" class="mt-1 w-full bg-transparent outline-none border border-slate-800 rounded p-2" />
+            </div>
+
+            <div>
+              <label class="text-xs text-slate-400">Eviction policy</label>
+              <select name="policy" class="mt-1 w-full bg-transparent outline-none border border-slate-800 rounded p-2">
+                <option value="LRU">LRU</option>
+                <option value="LFU">LFU</option>
+                <option value="TTL">TTL-based</option>
+                <option value="Manual">Manual</option>
+              </select>
+            </div>
+
+            <div class="flex items-end">
+              <button type="submit" class="ml-auto bg-yellow-500 text-black px-4 py-2 rounded font-semibold">Create Pool</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Data Grid -->
+        <div class="glass rounded-xl p-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-white font-semibold">Pools table</h3>
+            <div class="text-sm text-slate-400">Showing <strong id="rowCount">3</strong> items</div>
+          </div>
+
+          <div class="mt-4 overflow-auto">
+            <table class="min-w-full table-fixed text-sm">
+              <thead>
+                <tr class="text-left text-xs text-slate-400 border-b border-slate-800">
+                  <th class="p-2 w-48">Name</th>
+                  <th class="p-2">TTL (s)</th>
+                  <th class="p-2">Policy</th>
+                  <th class="p-2">Items</th>
+                  <th class="p-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="gridBody">
+                <!-- rows injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <footer class="p-4 text-xs text-slate-500 text-center">Volatix &mdash; Cache lifecycle manager</footer>
+
+  <script>
+    // sample data & grid rendering
+    const pools = [
+      {name: 'sessions-cache', ttl: 3600, policy: 'LRU', items: 1250},
+      {name: 'product-cache', ttl: 7200, policy: 'LFU', items: 460},
+      {name: 'temp-objects', ttl: 180, policy: 'TTL', items: 34},
+    ];
+
+    function renderGrid(){
+      const body = document.getElementById('gridBody');
+      body.innerHTML = '';
+      pools.forEach((p, i)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-2">${p.name}</td>
+          <td class="p-2">${p.ttl}</td>
+          <td class="p-2">${p.policy}</td>
+          <td class="p-2">${p.items}</td>
+          <td class="p-2">
+            <button data-i="${i}" class="px-2 py-1 text-xs rounded bg-yellow-500 text-black view-btn">View</button>
+            <button data-i="${i}" class="px-2 py-1 text-xs rounded border border-slate-700 edit-btn">Edit</button>
+          </td>
+        `;
+        body.appendChild(tr);
+      });
+      document.getElementById('rowCount').innerText = pools.length;
+    }
+
+    renderGrid();
+
+    // handle create form
+    document.getElementById('poolForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const f = e.target;
+      const newPool = {name: f.name.value.trim(), ttl: Number(f.ttl.value||0), policy: f.policy.value, items: 0};
+      if(!newPool.name) return alert('Please provide a pool name');
+      pools.push(newPool);
+      f.reset();
+      renderGrid();
+    });
+
+    // simple delegation for edit / view
+    document.addEventListener('click', (e)=>{
+      if(e.target.classList.contains('view-btn')){
+        const i = Number(e.target.dataset.i);
+        alert(JSON.stringify(pools[i], null, 2));
+      }
+      if(e.target.classList.contains('edit-btn')){
+        const i = Number(e.target.dataset.i);
+        const newTtl = prompt('Set new TTL (seconds)', pools[i].ttl);
+        if(newTtl!==null) { pools[i].ttl = Number(newTtl); renderGrid(); }
+      }
+    });
+
+       const toggleBtn = document.getElementById('themeToggle');
+  const body = document.body;
+
+  toggleBtn.addEventListener('click', () => {
+    body.classList.toggle('light-mode');
+
+    if (body.classList.contains('light-mode')) {
+      body.classList.remove('bg-black', 'text-yellow-400');
+      body.classList.add('bg-white', 'text-black');
+      toggleBtn.textContent = 'Dark Mode';
+      toggleBtn.classList.remove('bg-yellow-400', 'text-black');
+      toggleBtn.classList.add('bg-black', 'text-white');
+    } else {
+      body.classList.add('bg-black', 'text-yellow-400');
+      body.classList.remove('bg-white', 'text-black');
+      toggleBtn.textContent = 'Light Mode';
+      toggleBtn.classList.add('bg-yellow-400', 'text-black');
+      toggleBtn.classList.remove('bg-black', 'text-white');
+    }
+  });
+  </script>
+</body>
+</html>
