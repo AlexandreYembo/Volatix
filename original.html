@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Volatix Admin</title>
+  <style>
+    :root{
+      --bg:#0b0b0b;
+      --panel: rgba(255,255,255,0.06);
+      --glass-border: rgba(255,255,255,0.08);
+      --accent: #f4c400; /* yellow */
+      --muted: #bdbdbd;
+      --card-radius: 14px;
+      --glass-blur: 10px;
+      --glass-contrast: 0.8;
+    }
+
+    /* Light theme overrides */
+    :root.light{
+      --bg: linear-gradient(180deg,#f6f7f9,#e9ecf0);
+      --panel: rgba(255,255,255,0.6);
+      --glass-border: rgba(0,0,0,0.06);
+      --accent: #F2A900;
+      --muted: #404040;
+    }
+
+    html,body{height:100%;margin:0;font-family:Inter, Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;color:var(--muted);background:var(--bg);}
+
+    /* Topbar / Title */
+    .topbar{
+      display:flex;align-items:center;gap:16px;padding:18px 28px;
+      backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-contrast));
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand img{width:44px;height:44px;object-fit:contain;border-radius:10px}
+    .brand h1{margin:0;font-size:20px;color:var(--accent);letter-spacing:0.6px}
+    .brand small{display:block;font-size:12px;color:var(--muted)}
+
+    /* Layout */
+    .wrap{display:grid;grid-template-columns:260px 1fr;gap:20px;padding:22px;max-width:1400px;margin:18px auto}
+
+    /* Sidebar */
+    .sidebar{padding:14px;border-radius:var(--card-radius);background:var(--panel);backdrop-filter: blur(var(--glass-blur));border:1px solid var(--glass-border);height:calc(100vh - 160px)}
+    .nav{display:flex;flex-direction:column;gap:8px}
+    .nav a{padding:10px;border-radius:10px;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:10px}
+    .nav a.active{background:rgba(0,0,0,0.18);color:var(--accent)}
+
+    /* Content area */
+    .content{min-height:70vh}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:20px}
+
+    .card{padding:16px;border-radius:12px;background:var(--panel);border:1px solid var(--glass-border);backdrop-filter: blur(var(--glass-blur));}
+    .card h2{margin:0 0 12px 0;color:var(--muted)}
+
+    /* Simple form */
+    .form-group{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+    label{font-size:13px;color:var(--muted)}
+    input,select,textarea{padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);background:transparent;color:inherit}
+    .row{display:flex;gap:10px}
+    .btn{background:var(--accent);border:none;color:#111;padding:10px 12px;border-radius:10px;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid var(--glass-border;color:var(--muted))}
+
+    /* Data grid (simple table) */
+    table{width:100%;border-collapse:collapse;color:var(--muted);font-size:14px}
+    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left}
+    th{font-size:13px;color:var(--muted);}
+    tr:hover td{background:rgba(255,255,255,0.02)}
+
+    /* Icon circle for X (fallback if image not provided) */
+    .icon-circle{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#0b0b0b;border:2px solid rgba(255,255,255,0.04)}
+    .icon-circle svg{width:34px;height:34px}
+
+    /* Footer controls */
+    .controls{margin-left:auto;display:flex;gap:12px;align-items:center}
+    .toggle{display:inline-flex;align-items:center;gap:8px}
+    .switch{width:48px;height:28px;border-radius:16px;background:rgba(255,255,255,0.12);position:relative;padding:4px;cursor:pointer}
+    .knob{width:20px;height:20px;background:white;border-radius:50%;position:absolute;left:4px;top:4px;transition:all .18s}
+    .switch.on{background:linear-gradient(90deg,var(--accent), #ffcc33)}
+    .switch.on .knob{left:24px}
+
+    /* small responsive */
+    @media (max-width:900px){.wrap{grid-template-columns:1fr;padding:12px}.sidebar{display:none}.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <!-- Replace src with your PNG (transparent) exported file named "volatix-icon.png" -->
+      <img id="brand-img" src="volatix-icon.png" alt="Volatix" onerror="this.style.display='none'"/>
+      <div>
+        <h1>Volatix <span style="font-weight:600;color:var(--muted);font-size:12px">Admin</span></h1>
+        <small>Cache lifecycle & orchestration</small>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div style="display:flex;align-items:center;gap:12px">
+        <label style="font-size:13px;color:var(--muted)">Theme</label>
+        <div id="themeSwitch" class="switch" title="Toggle theme" onclick="toggleTheme()">
+          <div class="knob"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <aside class="sidebar card">
+      <nav class="nav">
+        <a class="active">Dashboard</a>
+        <a>Caches</a>
+        <a>Policies</a>
+        <a>Jobs</a>
+        <a>Settings</a>
+      </nav>
+
+      <div style="margin-top:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:12px;color:var(--muted)">Status</div>
+            <div style="font-weight:700;color:var(--accent)">Healthy</div>
+          </div>
+          <div style="text-align:right;font-size:12px;color:var(--muted)">v0.1</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="grid">
+        <section>
+            <div class="card">
+              <h2>Active caches</h2>
+              <table>
+                <thead>
+                  <tr><th>Name</th><th>Items</th><th>TTL</th><th>Hits</th></tr>
+                </thead>
+                <tbody id="cache-table">
+                  <!-- JS will populate sample rows -->
+                </tbody>
+              </table>
+          
+              <!-- Pagination -->
+              <div class="pagination">
+                <button class="btn" id="prevPage">Prev</button>
+                <span id="page-info" class="page-info">Page 1 of 10</span>
+                <button class="btn" id="nextPage">Next</button>
+              </div>
+            </div>
+          
+            <div class="card" style="margin-top:16px">
+              <h2>Create cache policy</h2>
+              <div class="form-group">
+                <label>Policy name</label>
+                <input id="policyName" placeholder="short-name" />
+              </div>
+              <div class="form-group">
+                <label>TTL (seconds)</label>
+                <input id="policyTTL" type="number" value="3600" />
+              </div>
+              <div class="form-group">
+                <label>Eviction strategy</label>
+                <select id="strategy"><option>LRU</option><option>LFU</option><option>Time-based</option></select>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn" onclick="createPolicy()">Create</button>
+                <button class="btn" style="background:transparent;color:var(--muted);border:1px solid var(--glass-border)" onclick="resetForm()">Reset</button>
+              </div>
+            </div>
+          </section>
+        <aside>
+          <div class="card" style="display:flex;flex-direction:column;gap:12px;align-items:stretch">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="icon-circle" id="logoFallback">
+                <!-- fallback SVG X if image not available -->
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 21L21 3M21 21L3 3" stroke="url(#g)" stroke-width="2" stroke-linecap="square"/>
+                  <defs>
+                    <linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#F4C400"/><stop offset="1" stop-color="#F2A900"/></linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div>
+                <div style="font-weight:700;color:var(--muted)">Volatix</div>
+                <div style="font-size:12px;color:var(--muted)">Icon & quick actions</div>
+              </div>
+            </div>
+
+            <div>
+              <button class="btn" onclick="purgeSelected()">Purge selected cache</button>
+            </div>
+
+            <div>
+              <h3 style="margin:0 0 8px 0;color:var(--muted)">Quick toggles</h3>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <label><input type="checkbox" id="autoPurge" /> Auto-purge expired</label>
+                <label><input type="checkbox" id="notify" checked /> Notify on eviction</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <h2>Logs</h2>
+            <div id="logs" style="font-family:monospace;font-size:12px;max-height:160px;overflow:auto;color:var(--muted)">-- no logs --</div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Theme handling
+    const root = document.documentElement;
+    const themeSwitch = document.getElementById('themeSwitch');
+
+    function setTheme(isLight){
+      if(isLight){
+        document.documentElement.classList.add('light');
+        themeSwitch.classList.add('on');
+        localStorage.setItem('volatix-theme','light');
+      } else {
+        document.documentElement.classList.remove('light');
+        themeSwitch.classList.remove('on');
+        localStorage.setItem('volatix-theme','dark');
+      }
+    }
+
+    function toggleTheme(){
+      const isLight = document.documentElement.classList.contains('light');
+      setTheme(!isLight);
+    }
+
+    // initialize theme from storage or system
+    (function(){
+      const saved = localStorage.getItem('volatix-theme');
+      if(saved) setTheme(saved==='light');
+      else setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches);
+    })();
+
+    // Sample grid population
+    const sample = [
+      {name:'session-cache',items:1234,ttl:'1h',hits:23456},
+      {name:'product-cache',items:56,ttl:'30m',hits:8923},
+      {name:'user-claims',items:12,ttl:'5m',hits:1200}
+    ];
+    const tbody = document.getElementById('cache-table');
+    function renderTable(){
+      tbody.innerHTML = sample.map(s=>`<tr><td>${s.name}</td><td>${s.items}</td><td>${s.ttl}</td><td>${s.hits}</td></tr>`).join('');
+    }
+    renderTable();
+
+    // Simple actions
+    function createPolicy(){
+      const name = document.getElementById('policyName').value||'unnamed';
+      const ttl = document.getElementById('policyTTL').value||3600;
+      const strat = document.getElementById('strategy').value;
+      addLog(`Created policy ${name} (ttl=${ttl}s, strategy=${strat})`);
+      alert('Policy created — this is a demo UI.');
+    }
+    function resetForm(){document.getElementById('policyName').value='';document.getElementById('policyTTL').value='3600';}
+    function purgeSelected(){addLog('Purge triggered');alert('Purge executed (demo)');}
+
+    // logs
+    function addLog(txt){
+      const logs = document.getElementById('logs');
+      const t = new Date().toLocaleString();
+      if(logs.innerText.trim()==='-- no logs --') logs.innerText = '';
+      logs.innerText = `${t} - ${txt}\n` + logs.innerText;
+    }
+
+    // Fallback: hide fallback icon if image loads
+    const img = document.getElementById('brand-img');
+    if(img){
+      img.addEventListener('error', ()=>document.getElementById('logoFallback').style.display='grid');
+      img.addEventListener('load', ()=>document.getElementById('logoFallback').style.display='none');
+    }
+
+
+
+    //begin grid
+    const tableBody = document.getElementById('cache-table');
+  const prevBtn = document.getElementById('prevPage');
+  const nextBtn = document.getElementById('nextPage');
+  const pageNumbers = document.getElementById('pageNumbers');
+
+  let currentPage = 1;
+  const rowsPerPage = 5;
+
+  // Sample data (replace with API data)
+  const caches = Array.from({length: 42}, (_, i) => ({
+    name: `Cache-${i+1}`,
+    items: Math.floor(Math.random()*500),
+    ttl: `${Math.floor(Math.random()*3600)}s`,
+    hits: Math.floor(Math.random()*1000)
+  }));
+
+  function renderTablePage(page) {
+    tableBody.innerHTML = '';
+    let start = (page - 1) * rowsPerPage;
+    let end = start + rowsPerPage;
+    let paginatedData = caches.slice(start, end);
+
+    paginatedData.forEach(c => {
+      let row = `<tr>
+        <td>${c.name}</td>
+        <td>${c.items}</td>
+        <td>${c.ttl}</td>
+        <td>${c.hits}</td>
+      </tr>`;
+      tableBody.innerHTML += row;
+    });
+
+    renderPageNumbers();
+  }
+
+  function renderPageNumbers() {
+    pageNumbers.innerHTML = '';
+    let totalPages = Math.ceil(caches.length / rowsPerPage);
+    for (let i = 1; i <= totalPages; i++) {
+      let btn = document.createElement('button');
+      btn.textContent = i;
+      btn.className = "btn";
+      if (i === currentPage) {
+        btn.style.background = "var(--accent)";
+        btn.style.color = "#000";
+      }
+      btn.addEventListener('click', () => {
+        currentPage = i;
+        renderTablePage(currentPage);
+      });
+      pageNumbers.appendChild(btn);
+    }
+  }
+
+  prevBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderTablePage(currentPage);
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    let totalPages = Math.ceil(caches.length / rowsPerPage);
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderTablePage(currentPage);
+    }
+  });
+
+  // Initial render
+  renderTablePage(currentPage);
+
+    //end grid
+  </script>
+</body>
+</html>
